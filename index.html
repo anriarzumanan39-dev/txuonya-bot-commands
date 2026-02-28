@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tuxonya Chat Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #7B2FBE;
+    --purple-light: #9B4FDE;
+    --purple-dark: #4A0E8F;
+    --gold: #FFD700;
+    --gold-light: #FFE55C;
+    --bg: #0D0D1A;
+    --card: #141428;
+    --card2: #1A1A35;
+    --text: #E8E8FF;
+    --text-dim: #9999BB;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ===== ФОНОВАЯ АНИМАЦИЯ ===== */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 20% 20%, rgba(123,47,190,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(155,79,222,0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(74,14,143,0.08) 0%, transparent 60%);
+    animation: bgMove 8s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes bgMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(2%, 2%); }
+  }
+
+  /* ===== ШАПКА ===== */
+  header {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 80px 20px 60px;
+    background: linear-gradient(180deg, rgba(123,47,190,0.3) 0%, transparent 100%);
+    border-bottom: 1px solid rgba(123,47,190,0.3);
+  }
+
+  .logo-wrap {
+    display: inline-block;
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .logo-glow {
+    position: absolute;
+    inset: -20px;
+    background: radial-gradient(circle, rgba(123,47,190,0.4) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.1); opacity: 1; }
+  }
+
+  .logo-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 30px;
+    border: 3px solid var(--purple-light);
+    box-shadow: 0 0 40px rgba(123,47,190,0.6);
+    position: relative;
+    z-index: 1;
+    background: linear-gradient(135deg, #4A0E8F, #9B4FDE);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 28px;
+    color: white;
+    letter-spacing: 2px;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(48px, 10vw, 90px);
+    letter-spacing: 6px;
+    background: linear-gradient(135deg, #fff 0%, var(--gold) 50%, #fff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(16px, 4vw, 24px);
+    color: var(--gold);
+    letter-spacing: 8px;
+    margin-bottom: 30px;
+    opacity: 0.9;
+  }
+
+  .desc {
+    color: var(--text-dim);
+    font-size: 16px;
+    max-width: 500px;
+    margin: 0 auto 40px;
+    line-height: 1.7;
+  }
+
+  .btn-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--purple), var(--purple-light));
+    color: white;
+    text-decoration: none;
+    padding: 16px 36px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    box-shadow: 0 0 30px rgba(123,47,190,0.5);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .btn-add:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 40px rgba(123,47,190,0.7);
+  }
+
+  /* ===== СТАТИСТИКА ===== */
+  .stats-bar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 30px 20px;
+    flex-wrap: wrap;
+  }
+
+  .stat-item {
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 36px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    display: block;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* ===== ОСНОВНОЙ КОНТЕНТ ===== */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 32px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255,215,0,0.4), transparent);
+  }
+
+  .section {
+    margin-bottom: 50px;
+  }
+
+  /* ===== КАРТОЧКИ КОМАНД ===== */
+  .commands-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+
+  .cmd-card {
+    background: var(--card);
+    border: 1px solid rgba(123,47,190,0.3);
+    border-radius: 16px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cmd-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--purple-light), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .cmd-card:hover {
+    border-color: rgba(123,47,190,0.7);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(123,47,190,0.2);
+  }
+
+  .cmd-card:hover::before {
+    opacity: 1;
+  }
+
+  .cmd-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .cmd-emoji {
+    font-size: 28px;
+    width: 48px;
+    height: 48px;
+    background: rgba(123,47,190,0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .cmd-name {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--gold-light);
+  }
+
+  .cmd-alias {
+    font-size: 11px;
+    color: var(--purple-light);
+    background: rgba(123,47,190,0.2);
+    padding: 2px 8px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-top: 2px;
+  }
+
+  .cmd-desc {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ===== СПЕЦИАЛЬНЫЕ КАРТОЧКИ ===== */
+  .cmd-card.featured {
+    background: linear-gradient(135deg, rgba(123,47,190,0.2), rgba(74,14,143,0.2));
+    border-color: rgba(255,215,0,0.3);
+  }
+
+  .cmd-card.featured .cmd-emoji {
+    background: rgba(255,215,0,0.15);
+  }
+
+  /* ===== ФИШКИ ===== */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+
+  .feature-card {
+    background: var(--card2);
+    border: 1px solid rgba(123,47,190,0.2);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .feature-card:hover {
+    border-color: rgba(255,215,0,0.3);
+    transform: translateY(-4px);
+  }
+
+  .feature-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .feature-title {
+    font-weight: 800;
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: white;
+  }
+
+  .feature-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  /* ===== СПЕЦИАЛЬНЫЕ КОМАНДЫ ===== */
+  .special-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .special-card {
+    background: var(--card);
+    border: 1px solid rgba(123,47,190,0.3);
+    border-radius: 16px;
+    padding: 20px;
+    transition: all 0.3s;
+  }
+
+  .special-card:hover {
+    border-color: var(--purple-light);
+    transform: translateY(-3px);
+  }
+
+  .special-trigger {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 18px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    background: rgba(255,215,0,0.1);
+    padding: 6px 14px;
+    border-radius: 8px;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+
+  .special-desc {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ===== ФУТЕР ===== */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid rgba(123,47,190,0.2);
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  footer a {
+    color: var(--purple-light);
+    text-decoration: none;
+  }
+
+  footer a:hover {
+    color: var(--gold);
+  }
+
+  /* ===== АНИМАЦИЯ ПОЯВЛЕНИЯ ===== */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeIn 0.6s ease forwards;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .cmd-card:nth-child(1) { animation-delay: 0.1s; }
+  .cmd-card:nth-child(2) { animation-delay: 0.15s; }
+  .cmd-card:nth-child(3) { animation-delay: 0.2s; }
+  .cmd-card:nth-child(4) { animation-delay: 0.25s; }
+  .cmd-card:nth-child(5) { animation-delay: 0.3s; }
+  .cmd-card:nth-child(6) { animation-delay: 0.35s; }
+
+  /* ===== МОБИЛЬНАЯ ВЕРСИЯ ===== */
+  @media (max-width: 600px) {
+    .stats-bar { gap: 20px; }
+    .commands-grid { grid-template-columns: 1fr; }
+    .features-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ШАПКА -->
+<header>
+  <div class="logo-wrap">
+    <div class="logo-glow"></div>
+    <div class="logo-img">TCM</div>
+  </div>
+  <h1>TUXONYA</h1>
+  <div class="subtitle">CHAT MANAGER</div>
+  <p class="desc">Мощный бот для управления твоим Telegram-чатом. Статистика, коины, игры и многое другое!</p>
+  <a href="https://t.me/tuxonya_cm_bot" class="btn-add">➕ Добавить в группу</a>
+</header>
+
+<!-- СТАТИСТИКА -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <span class="stat-num">19+</span>
+    <span class="stat-label">Команд</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">9</span>
+    <span class="stat-label">Игр и активностей</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">∞</span>
+    <span class="stat-label">Возможностей</span>
+  </div>
+</div>
+
+<main>
+
+  <!-- ФИШКИ -->
+  <div class="section fade-in">
+    <div class="section-title">✨ Возможности</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">📊</span>
+        <div class="feature-title">Статистика</div>
+        <div class="feature-desc">Полная история чата, топ активных участников за день, месяц и всё время</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">💰</span>
+        <div class="feature-title">Tuxonya Коины</div>
+        <div class="feature-desc">Внутренняя валюта чата. Зарабатывай, трать, переводи!</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🎮</span>
+        <div class="feature-title">Мини-игры</div>
+        <div class="feature-desc">Казино, блэкджек, дуэли, рыбалка и многое другое</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🤖</span>
+        <div class="feature-title">Мини-ИИ</div>
+        <div class="feature-desc">Отвечай на сообщения бота — он ответит тебе!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- СТАТИСТИКА -->
+  <div class="section fade-in">
+    <div class="section-title">📊 Статистика</div>
+    <div class="commands-grid">
+      <div class="cmd-card featured">
+        <div class="cmd-header">
+          <div class="cmd-emoji">📊</div>
+          <div>
+            <div class="cmd-name">/stats</div>
+            <span class="cmd-alias">статистика • /stata</span>
+          </div>
+        </div>
+        <div class="cmd-desc">Показывает полную статистику чата — всех участников, количество сообщений за день, месяц и всё время с процентами</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-emoji">🏓</div>
+          <div>
+            <div class="cmd-name">/ping</div>
+            <span class="cmd-alias">пинг</span>
+          </div>
+        </div>
+        <div class="cmd-desc">Показывает текущий пинг бота в миллисекундах</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- КОИНЫ -->
+  <div class="section fade-in">
+    <div class="section-title">💰 Tuxonya Коины</div>
+    <div class="commands-grid">
+      <div class="cmd-card featured">
+        <div class="cmd-header">
+          <div class="cmd-emoji">💰</div>
+          <div>
+            <div class="cmd-name">/balance</div>
+            <span class="cmd-alias">/bal</span>
+          </div>
+        </div>
+        <div class="cmd-desc">Показывает твой баланс коинов в кошельке и в банке</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-emoji">🎁</div>
+          <div>
+            <div class="cmd-name">/daily</div>
+          </div>
+        </div>
+        <div class="cmd-desc">Ежедневная награда — получи от 40 до 100 случайных коинов раз в 24 часа</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-emoji">💸</div>
+          <div>
+            <div class="cmd-name">/transfer 100</div>
+            <span class="cmd-alias">/pay 100</span>
+          </div>
+        </div>
+        <div class="cmd-desc">Переводит коины другому участнику. Ответь на его сообщение и укажи сумму</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-emoji">🏆</div>
+          <div>
+            <div class="cmd-name">/topcash</div>
+          </div>
+        </div>
+        <div class="cmd-desc">Топ 10 самых богатых участников чата</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-emoji">🏦</div>
+          <div>
+            <div class="cmd-name">/deposit 100</div>
+          </div>
+        </div>
+        <div class="cmd-desc">Кладёт коины в банк. Через 24 часа получишь +10% прибыли</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-emoji">🏦</div>
+          <div>
+            <div class="cmd-name">/withdraw</div>
+          </div>
+        </div>
+        <div class="cmd-desc">Снимает коины из банка. Досрочно — без процентов, после 24ч — с +10%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ИГРЫ -->
+  <div class="section fade-in">
+    <div class="section-title">🎮 Игры</div>
+    <div class="commands-grid">
+      <div class="cmd-card featured">
+        <div class="cmd-header">
+          <div class="cmd-emoji">🎰</div>
+          <div>
+            <div class="cmd-name">/casino 50</div>
+            <span class="cmd-alias">/slot 50</span>
+          </div>
+        </div>
+        <div class="cmd-desc">Крути слоты! Три одинаковых — x3, три семёрки — x10 джекпот! Минимальная ставка: 10 коинов</div>
+      </div>
+      <div class="cmd-card featured">
+        <div class="cmd-header">
+          <div class="cmd-emoji">🃏</div>
+          <div>
+            <div class="cmd-name">/blackjack 50</div>
+            <span class="cmd-alias">/bj 50</span>
+          </div>
+        </div>
+        <div class="cmd-desc">Блэкджек против дилера! После начала игры: /hit — ещё карту, /stand — остановиться</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-emoji">🎣</div>
+          <div>
+            <div class="cmd-name">/fish</div>
+          </div>
+        </div>
+        <div class="cmd-desc">Рыбалка раз в час! Лови рыбу и продавай за коины. Можно поймать золотую рыбку!</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-emoji">💣</div>
+          <div>
+            <div class="cmd-name">/rob</div>
+          </div>
+        </div>
+        <div class="cmd-desc">Ограбь другого участника! Шанс успеха 40%. При провале — сам заплатишь штраф</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-emoji">🎲</div>
+          <div>
+            <div class="cmd-name">/dice</div>
+          </div>
+        </div>
+        <div class="cmd-desc">Бросить кубик — выпадает число от 1 до 6</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-emoji">🪙</div>
+          <div>
+            <div class="cmd-name">/flip</div>
+          </div>
+        </div>
+        <div class="cmd-desc">Подбросить монетку — орёл или решка!</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-emoji">⚔️</div>
+          <div>
+            <div class="cmd-name">/duel</div>
+          </div>
+        </div>
+        <div class="cmd-desc">Вызов на дуэль! Ответь на сообщение соперника. Принять: /accept, Отказаться: /decline</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-emoji">🎮</div>
+          <div>
+            <div class="cmd-name">/guess</div>
+          </div>
+        </div>
+        <div class="cmd-desc">Угадай число от 1 до 100! Бот подсказывает больше или меньше</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- РАЗНОЕ -->
+  <div class="section fade-in">
+    <div class="section-title">🎁 Разное</div>
+    <div class="commands-grid">
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-emoji">🎁</div>
+          <div>
+            <div class="cmd-name">/gift</div>
+          </div>
+        </div>
+        <div class="cmd-desc">Отправить подарок участнику чата за 30 коинов. Ответь на его сообщение</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-emoji">🔮</div>
+          <div>
+            <div class="cmd-name">/predict</div>
+            <span class="cmd-alias">/fortune</span>
+          </div>
+        </div>
+        <div class="cmd-desc">Получи случайное предсказание на день за 10 коинов 😄</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-emoji">🎪</div>
+          <div>
+            <div class="cmd-name">/lottery</div>
+          </div>
+        </div>
+        <div class="cmd-desc">Купи лотерейный билет за 50 коинов. Победитель получает весь призовой фонд!</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-emoji">🧧</div>
+          <div>
+            <div class="cmd-name">/grab</div>
+          </div>
+        </div>
+        <div class="cmd-desc">Поймать дроп коинов! Первый кто напишет — забирает всё</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- СПЕЦИАЛЬНЫЕ ФРАЗЫ -->
+  <div class="section fade-in">
+    <div class="section-title">🤪 Специальные фразы</div>
+    <div class="special-grid">
+      <div class="special-card">
+        <div class="special-trigger">тихоня кто гений</div>
+        <div class="special-desc">Бот выбирает рандомного участника чата и называет его гением 🧠</div>
+      </div>
+      <div class="special-card">
+        <div class="special-trigger">тихоня кто лучший</div>
+        <div class="special-desc">Рандомный участник получает звание лучшего в чате 🏆</div>
+      </div>
+      <div class="special-card">
+        <div class="special-trigger">тихоня кто босс</div>
+        <div class="special-desc">Кто сегодня настоящий босс чата? 😎</div>
+      </div>
+      <div class="special-card">
+        <div class="special-trigger">тихоня кто лох</div>
+        <div class="special-desc">Кому сегодня не везёт? 😂 (не обижайся, это рандом!)</div>
+      </div>
+      <div class="special-card">
+        <div class="special-trigger">тихоня кто красивый</div>
+        <div class="special-desc">Самый красивый участник чата сегодня — узнай! 😍</div>
+      </div>
+      <div class="special-card">
+        <div class="special-trigger">статистика</div>
+        <div class="special-desc">Написать слово "статистика" в чате — покажет статистику без команды</div>
+      </div>
+      <div class="special-card">
+        <div class="special-trigger">пинг</div>
+        <div class="special-desc">Написать "пинг" в чате — бот покажет свой пинг</div>
+      </div>
+      <div class="special-card">
+        <div class="special-trigger">Ответить боту</div>
+        <div class="special-desc">Ответь на любое сообщение бота — он ответит тебе с шансом 70% 😄</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ФУТЕР -->
+<footer>
+  <p>🤖 <strong>Tuxonya Chat Manager</strong> — бот для твоего Telegram чата</p>
+  <br>
+  <p>
+    <a href="https://t.me/tuxonya_cm_bot">➕ Добавить бота</a> &nbsp;•&nbsp;
+    <a href="https://t.me/Tuxonyaaa">💬 Поддержка</a>
+  </p>
+  <br>
+  <p style="font-size:12px; opacity:0.5;">© 2025 Tuxonya Chat Manager. Все права защищены.</p>
+</footer>
+
+<script>
+  // Плавное появление при скролле
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.section').forEach(el => {
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+</script>
+
+</body>
+  </html>
